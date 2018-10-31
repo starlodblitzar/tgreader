@@ -126,8 +126,6 @@ def message_handler(app, message: Message) -> None:
 
     payload: dict = dict()
 
-    print(message.chat)
-
     if message.chat.type in chanel_types + group_types and message.chat.title not in BANNED_CHANNELS:
         channel_id: Optional[str] = None
 
