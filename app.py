@@ -186,7 +186,7 @@ def message_handler(app, message: Message) -> None:
             LOG.info('Sending the following payload to the server: {}'.format(str(payload).encode('utf-8')))
 
             try:
-                response = post('http://localhost:9091/api/telegram/messages', dumps(payload))
+                response = post('http://alterspace.info:9091/api/telegram/messages', dumps(payload))
                 LOG.info('Got the following response: status_code: {}, text: {}'.format(response.status_code,
                                                                                             response.text))
             except Exception as e:
