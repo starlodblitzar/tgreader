@@ -86,36 +86,37 @@ class ChannelHandler(RequestHandler):
     def get(self) -> None:
         response: dict = dict()
 
-        # LOG.info('Sending request for contacts to telegram to get list of dialogs')
-        #
-        # dialogs: Dialogs = tg_app.send(
-        #     GetDialogs(
-        #         0, 0, tg_app.resolve_peer('me'), 200
-        #     )
-        # )
-        #
-        # LOG.info('Got the following list of dialogs: {}'.format(dialogs))
-        #
-        # # filter dialogs for forbidden chats
-        # filtered_data: List[Union[ChatEmpty, Chat, Channel]] = [chat for chat in dialogs.chats if type(chat) not in [
-        #     ChatForbidden, ChannelForbidden] and chat.title not in BANNED_CHANNELS
-        # ]
-        #
-        #
-        # payload: List[str, Union[ChatEmpty, Chat, Channel]] = [{
-        #     'id': elem.id,
-        #     'name': elem.title,
-        #     'type': (lambda x: 'CHANNEL' if type(x) == Channel else 'CHAT')(elem)
-        # } for elem in filtered_data]
-        #
-        # response.update({
-        #     "success": True,
-        #     "data": payload
-        # })
-        #
-        # LOG.info('Sending response for channels request: {}'.format(response))
+        LOG.info('Sending request for contacts to telegram to get list of dialogs')
 
-        response.update({'success': True})
+        dialogs: Dialogs = tg_app.send(
+            GetDialogs(
+                0, 0, tg_app.resolve_peer('me'), 200
+            )
+        )
+
+        LOG.info('Got the following list of dialogs: {}'.format(dialogs))
+
+        # filter dialogs for forbidden chats
+        filtered_data: List[Union[ChatEmpty, Chat, Channel]] = [chat for chat in dialogs.chats if type(chat) not in [
+            ChatForbidden, ChannelForbidden] and chat.title not in BANNED_CHANNELS
+        ]
+
+
+        payload: List[str, Union[ChatEmpty, Chat, Channel]] = [{
+            'id': elem.id,
+            'name': elem.title,
+            'type': (lambda x: 'CHANNEL' if type(x) == Channel else 'CHAT')(elem)
+        } for elem in filtered_data]
+
+        response.update({
+            "success": True,
+            "data": payload
+        })
+
+        LOG.info('Sending response for channels request: {}'.format(response))
+
+        # test
+        # response.update({'success': True})
 
         self.write(dumps(response))
         self.flush()
@@ -127,6 +128,13 @@ def message_handler(app, message: Message) -> None:
     group_types: List[str] = ['group']
 
     payload: dict = dict()
+
+    # test
+    dialogs: Dialogs = tg_app.send(
+        GetDialogs(
+            0, 0, tg_app.resolve_peer('me'), 200
+        )
+    )
 
     if message.chat.type in chanel_types + group_types and message.chat.title not in BANNED_CHANNELS:
         channel_id: Optional[str] = None
@@ -196,13 +204,10 @@ def message_handler(app, message: Message) -> None:
             LOG.info('Got message without image or text. Not sending to the server')
 
 
-# init app
-app: Application = Application([
-    (r'/channels', ChannelHandler)
-])
-app.listen(port=9001, address='0.0.0.0')
-LOG.info('App inited.')
-
-
 if __name__ == "__main__":
+    app: Application = Application([
+        (r'/channels', ChannelHandler)
+    ])
+    app.listen(port=9001, address='0.0.0.0')
+    LOG.info('App inited.')
     IOLoop.current().start()
