@@ -100,6 +100,11 @@ class ChannelHandler(RequestHandler):
         except Exception as e:
             LOG.error('Failed to get response from telegram with the following error: {}'.format(e))
 
+            response.update({'success': False})
+
+            self.write(dumps(response))
+            self.flush()
+
         # filter dialogs for forbidden chats
         filtered_data: List[Union[ChatEmpty, Chat, Channel]] = [chat for chat in dialogs.chats if type(chat) not in [
             ChatForbidden, ChannelForbidden] and chat.title not in BANNED_CHANNELS
