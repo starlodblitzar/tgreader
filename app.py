@@ -88,13 +88,17 @@ class ChannelHandler(RequestHandler):
 
         LOG.info('Sending request for contacts to telegram to get list of dialogs')
 
-        dialogs: Dialogs = tg_app.send(
-            GetDialogs(
-                0, 0, tg_app.resolve_peer('me'), 200
+        try:
+            dialogs: Dialogs = tg_app.send(
+                GetDialogs(
+                    0, 0, tg_app.resolve_peer('me'), 200
+                )
             )
-        )
 
-        LOG.info('Got the following list of dialogs: {}'.format(dialogs))
+            LOG.info('Got the following list of dialogs: {}'.format(dialogs))
+
+        except Exception as e:
+            LOG.error('Failed to get response from telegram with the following error: {}'.format(e))
 
         # filter dialogs for forbidden chats
         filtered_data: List[Union[ChatEmpty, Chat, Channel]] = [chat for chat in dialogs.chats if type(chat) not in [
