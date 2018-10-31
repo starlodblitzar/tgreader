@@ -115,9 +115,6 @@ class ChannelHandler(RequestHandler):
 
         LOG.info('Sending response for channels request: {}'.format(response))
 
-        # test
-        # response.update({'success': True})
-
         self.write(dumps(response))
         self.flush()
 
@@ -128,13 +125,6 @@ def message_handler(app, message: Message) -> None:
     group_types: List[str] = ['group']
 
     payload: dict = dict()
-
-    # test
-    dialogs: Dialogs = tg_app.send(
-        GetDialogs(
-            0, 0, tg_app.resolve_peer('me'), 200
-        )
-    )
 
     if message.chat.type in chanel_types + group_types and message.chat.title not in BANNED_CHANNELS:
         channel_id: Optional[str] = None
