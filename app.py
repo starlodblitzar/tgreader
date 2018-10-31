@@ -86,34 +86,36 @@ class ChannelHandler(RequestHandler):
     def get(self) -> None:
         response: dict = dict()
 
-        LOG.info('Sending request for contacts to telegram to get list of dialogs')
+        # LOG.info('Sending request for contacts to telegram to get list of dialogs')
+        #
+        # dialogs: Dialogs = tg_app.send(
+        #     GetDialogs(
+        #         0, 0, tg_app.resolve_peer('me'), 200
+        #     )
+        # )
+        #
+        # LOG.info('Got the following list of dialogs: {}'.format(dialogs))
+        #
+        # # filter dialogs for forbidden chats
+        # filtered_data: List[Union[ChatEmpty, Chat, Channel]] = [chat for chat in dialogs.chats if type(chat) not in [
+        #     ChatForbidden, ChannelForbidden] and chat.title not in BANNED_CHANNELS
+        # ]
+        #
+        #
+        # payload: List[str, Union[ChatEmpty, Chat, Channel]] = [{
+        #     'id': elem.id,
+        #     'name': elem.title,
+        #     'type': (lambda x: 'CHANNEL' if type(x) == Channel else 'CHAT')(elem)
+        # } for elem in filtered_data]
+        #
+        # response.update({
+        #     "success": True,
+        #     "data": payload
+        # })
+        #
+        # LOG.info('Sending response for channels request: {}'.format(response))
 
-        dialogs: Dialogs = tg_app.send(
-            GetDialogs(
-                0, 0, tg_app.resolve_peer('me'), 200
-            )
-        )
-
-        LOG.info('Got the following list of dialogs: {}'.format(dialogs))
-
-        # filter dialogs for forbidden chats
-        filtered_data: List[Union[ChatEmpty, Chat, Channel]] = [chat for chat in dialogs.chats if type(chat) not in [
-            ChatForbidden, ChannelForbidden] and chat.title not in BANNED_CHANNELS
-        ]
-
-
-        payload: List[str, Union[ChatEmpty, Chat, Channel]] = [{
-            'id': elem.id,
-            'name': elem.title,
-            'type': (lambda x: 'CHANNEL' if type(x) == Channel else 'CHAT')(elem)
-        } for elem in filtered_data]
-
-        response.update({
-            "success": True,
-            "data": payload
-        })
-
-        LOG.info('Sending response for channels request: {}'.format(response))
+        response.update({'success': True})
 
         self.write(dumps(response))
         self.flush()
