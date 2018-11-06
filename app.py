@@ -91,25 +91,25 @@ class ChannelHandler(RequestHandler):
 
         LOG.info('Sending request for contacts to telegram to get list of dialogs')
 
-        try:
-            dialogs = tg_app.send(
-                GetDialogs(
-                    0, 0, tg_app.resolve_peer('me'), 200
-                )
+        # try:
+        dialogs = tg_app.send(
+            GetDialogs(
+                0, 0, tg_app.resolve_peer('me'), 200
             )
+        )
 
-            LOG.info('Got the following list of dialogs: {}'.format(dialogs))
-
-        except Exception as e:
-            exc_type, exc_value, exc_traceback = exc_info()
-
-            LOG.error('Failed to get response from telegram with the following error: {}'.format(e))
-            print_tb(exc_traceback, file=stdout)
-
-            response.update({'success': False})
-
-            self.write(dumps(response))
-            self.flush()
+        LOG.info('Got the following list of dialogs: {}'.format(dialogs))
+        #
+        # except Exception as e:
+        #     exc_type, exc_value, exc_traceback = exc_info()
+        #
+        #     LOG.error('Failed to get response from telegram with the following error: {}'.format(e))
+        #     print_tb(exc_traceback, file=stdout)
+        #
+        #     response.update({'success': False})
+        #
+        #     self.write(dumps(response))
+        #     self.flush()
 
         if dialogs:
             # filter dialogs for forbidden chats
