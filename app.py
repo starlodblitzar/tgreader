@@ -90,6 +90,7 @@ class ChannelHandler(RequestHandler):
         LOG.info('Sending request for contacts to telegram to get list of dialogs')
 
         try:
+            print(tg_app)
             dialogs = tg_app.get_dialogs_chunk(offset_date=0)
 
             LOG.info('Got the following list of dialogs: {}'.format(dialogs))
