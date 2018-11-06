@@ -3,10 +3,10 @@ from tornado.web import Application, RequestHandler
 from tornado.httputil import HTTPServerRequest
 
 from pyrogram import Client
-from pyrogram.api.functions.messages import GetDialogs, GetAllChats
+from pyrogram.api.functions.messages import GetAllChats
 
 from pyrogram.api.types import Chat, ChannelForbidden, Channel, ChatForbidden, ChatEmpty, Message
-from pyrogram.api.types.messages import Dialogs
+from pyrogram.api.types.messages import ChatsSlice
 
 from logging import getLogger, Formatter, DEBUG
 from logging.handlers import TimedRotatingFileHandler
@@ -87,7 +87,7 @@ class ChannelHandler(RequestHandler):
 
     def get(self) -> None:
         response: dict = dict()
-        dialogs: Optional[Dialogs] = None
+        dialogs: Optional[ChatsSlice] = None
 
         LOG.info('Sending request for contacts to telegram to get list of dialogs')
 
@@ -96,7 +96,7 @@ class ChannelHandler(RequestHandler):
                 GetAllChats(except_ids=[])
             )
 
-            LOG.info('Got the following list of dialogs: {}'.format(dialogs))
+            LOG.info('Got the following list of dialogs: {}'.format(dialogs.__dict__))
 
         except Exception as e:
             LOG.error('Failed to get response from telegram with the following error: {}'.format(e))
@@ -145,13 +145,13 @@ def message_handler(app, message: Message) -> None:
         elif message.chat.type == 'group':
             channel_id = int(message.chat.id) * (-1)
 
-        LOG.info('Got the following message from channel {} with telegram_id {} and timestamp {}'.format(
+        LOG.info('Got message from channel {} with telegram_id {} and timestamp {}'.format(
                 str(message.chat.title).encode('utf-8'),
                 channel_id,
                 message.date)
         )
 
-        LOG.info("Message content: {}".format(message))
+        LOG.info("Message content: {}".format(str(message.__dict__)))
 
         payload.update({
             'channel_id': channel_id,
@@ -208,6 +208,6 @@ if __name__ == "__main__":
     app: Application = Application([
         (r'/channels', ChannelHandler)
     ])
-    app.listen(port=9001, address='0.0.0.0')
+    app.listen(port=9002, address='0.0.0.0')
     LOG.info('App inited.')
     IOLoop.current().start()
