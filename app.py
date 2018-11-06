@@ -5,7 +5,7 @@ from tornado.httputil import HTTPServerRequest
 from pyrogram import Client
 from pyrogram.api.functions.messages import GetDialogs
 from pyrogram.api.types import Chat, ChannelForbidden, Channel, ChatForbidden, ChatEmpty, Message
-from pyrogram.api.types.messages import Dialogs
+from pyrogram.api.types.messages import DialogsSlice
 
 from logging import getLogger, Formatter, DEBUG
 from logging.handlers import TimedRotatingFileHandler
@@ -13,6 +13,7 @@ from json import dumps, loads
 from requests import post, Response
 from typing import Optional, List, Union
 from os import remove
+from asyncio import wait
 
 
 # setup logger
@@ -32,7 +33,8 @@ BANNED_CHANNELS: List[str] = [
     'Бот',
     'trade-mate.io marketing',
     'Криптекс Маркетинг',
-    'trade-mate.io marketing elena'
+    'trade-mate.io marketing elena',
+    'Trade mate vs Eugene Romanenko St.P'
 ]
 
 try:
@@ -85,19 +87,14 @@ class ChannelHandler(RequestHandler):
 
     def get(self) -> None:
         response: dict = dict()
-        dialogs: Optional[Dialogs] = None
+        dialogs: Optional[DialogsSlice] = None
 
         LOG.info('Sending request for contacts to telegram to get list of dialogs')
 
         try:
-            print("""DIALOGS""")
-            dialogs = tg_app.get_dialogs()
-            print(dialogs)
-            for dialog in list(dialogs):
-                print(type(dialog))
-            print("""END DIALOGS""")
+            dialogs = tg_app.get_dialogs_chunk(offset_date=0)
 
-            # LOG.info('Got the following list of dialogs: {}'.format(dialogs))
+            LOG.info('Got the following list of dialogs: {}'.format(dialogs))
 
         except Exception as e:
             LOG.error('Failed to get response from telegram with the following error: {}'.format(e))
@@ -107,22 +104,24 @@ class ChannelHandler(RequestHandler):
             self.write(dumps(response))
             self.flush()
 
-        # if dialogs:
-        #     # payload: List[str, Union[ChatEmpty, Chat, Channel]] = [{
-        #     #     'id': elem.id,
-        #     #     'name': elem.title,
-        #     #     'type': (lambda x: 'CHANNEL' if type(x) == Channel else 'CHAT')(elem)
-        #     # } for elem in dialogs]
-        #
-        #     for elem in dialogs:
-        #         print(type(elem))
-        #         print(elem)
+        if dialogs:
 
+            filtered_data: List[Channel, Chat, ChatEmpty] = [
+                dialog for dialog in dialogs.chats if (
+                        type(dialog) not in [ChannelForbidden, ChatForbidden] and dialog.title not in BANNED_CHANNELS
+                )
+            ]
 
-            # response.update({
-            #     "success": True,
-            #     "data": payload
-            # })
+            payload: List[str, Union[ChatEmpty, Chat, Channel]] = [{
+                'id': elem.id,
+                'name': elem.title,
+                'type': (lambda x: 'CHANNEL' if type(x) == Channel else 'CHAT')(elem)
+            } for elem in filtered_data]
+
+            response.update({
+                "success": True,
+                "data": payload
+            })
 
             self.write(dumps(response))
 
