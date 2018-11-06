@@ -13,8 +13,6 @@ from json import dumps, loads
 from requests import post, Response
 from typing import Optional, List, Union
 from os import remove
-from sys import exc_info, stdout
-from traceback import print_tb
 
 
 # setup logger
@@ -94,15 +92,10 @@ class ChannelHandler(RequestHandler):
         try:
             dialogs = tg_app.get_dialogs()
 
-            print(dialogs)
-
             LOG.info('Got the following list of dialogs: {}'.format(dialogs))
 
         except Exception as e:
-            exc_type, exc_value, exc_traceback = exc_info()
-
             LOG.error('Failed to get response from telegram with the following error: {}'.format(e))
-            print_tb(exc_traceback, file=stdout)
 
             response.update({'success': False})
 
@@ -110,16 +103,11 @@ class ChannelHandler(RequestHandler):
             self.flush()
 
         if dialogs:
-            # filter dialogs for forbidden chats
-            filtered_data: List[Union[ChatEmpty, Chat, Channel]] = [chat for chat in dialogs.chats if type(chat) not in [
-                ChatForbidden, ChannelForbidden] and chat.title not in BANNED_CHANNELS
-            ]
-
             payload: List[str, Union[ChatEmpty, Chat, Channel]] = [{
                 'id': elem.id,
                 'name': elem.title,
                 'type': (lambda x: 'CHANNEL' if type(x) == Channel else 'CHAT')(elem)
-            } for elem in filtered_data]
+            } for elem in dialogs]
 
             response.update({
                 "success": True,
