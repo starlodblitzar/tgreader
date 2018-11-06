@@ -13,6 +13,8 @@ from json import dumps, loads
 from requests import post, Response
 from typing import Optional, List, Union
 from os import remove
+from sys import exc_info
+from traceback import print_tb
 
 
 # setup logger
@@ -98,7 +100,12 @@ class ChannelHandler(RequestHandler):
             LOG.info('Got the following list of dialogs: {}'.format(dialogs))
 
         except Exception as e:
-            LOG.error('Failed to get response from telegram with the following error: {}'.format(e))
+            exc_type, exc_value, exc_traceback = exc_info()
+
+            LOG.error('Failed to get response from telegram with the following error: {}. Traceback: {}.'.format(
+                e,
+                exc_traceback)
+            )
 
             response.update({'success': False})
 
