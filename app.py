@@ -92,7 +92,7 @@ class ChannelHandler(RequestHandler):
         try:
             dialogs = tg_app.get_dialogs()
 
-            LOG.info('Got the following list of dialogs: {}'.format(dialogs))
+            # LOG.info('Got the following list of dialogs: {}'.format(dialogs))
 
         except Exception as e:
             LOG.error('Failed to get response from telegram with the following error: {}'.format(e))
@@ -111,6 +111,7 @@ class ChannelHandler(RequestHandler):
 
             for elem in dialogs:
                 print(type(elem))
+                print(elem)
 
 
             # response.update({
