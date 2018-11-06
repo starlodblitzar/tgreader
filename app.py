@@ -208,6 +208,6 @@ if __name__ == "__main__":
     app: Application = Application([
         (r'/channels', ChannelHandler)
     ])
-    app.listen(port=9002, address='0.0.0.0')
+    app.listen(port=9001, address='0.0.0.0')
     LOG.info('App inited.')
     IOLoop.current().start()
