@@ -3,7 +3,6 @@ from tornado.web import Application, RequestHandler
 from tornado.httputil import HTTPServerRequest
 
 from pyrogram import Client
-from pyrogram.api.functions.messages import GetDialogs
 from pyrogram.api.types import Chat, ChannelForbidden, Channel, ChatForbidden, ChatEmpty, Message
 from pyrogram.api.types.messages import DialogsSlice
 
@@ -13,7 +12,6 @@ from json import dumps, loads
 from requests import post, Response
 from typing import Optional, List, Union
 from os import remove
-from asyncio import wait
 
 
 # setup logger
@@ -93,7 +91,6 @@ class ChannelHandler(RequestHandler):
 
         try:
             dialogs = tg_app.get_dialogs_chunk(offset_date=0)
-            print(dialogs.chats)
 
             LOG.info('Got the following list of dialogs: {}'.format(dialogs))
 
