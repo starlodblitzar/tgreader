@@ -128,9 +128,10 @@ class ChannelHandler(RequestHandler):
                 "data": payload
             })
 
+            self.write(dumps(response))
+
         LOG.info('Sending response for channels request: {}'.format(response))
 
-        self.write(dumps(response))
         self.flush()
 
 @tg_app.on_message()
