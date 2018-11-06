@@ -87,11 +87,12 @@ class ChannelHandler(RequestHandler):
 
     def get(self) -> None:
         response: dict = dict()
+        dialogs: Optional[Dialogs] = None
 
         LOG.info('Sending request for contacts to telegram to get list of dialogs')
 
         try:
-            dialogs: Dialogs = tg_app.send(
+            dialogs = tg_app.send(
                 GetDialogs(
                     0, 0, tg_app.resolve_peer('me'), 200
                 )
@@ -110,22 +111,22 @@ class ChannelHandler(RequestHandler):
             self.write(dumps(response))
             self.flush()
 
-        # filter dialogs for forbidden chats
-        filtered_data: List[Union[ChatEmpty, Chat, Channel]] = [chat for chat in dialogs.chats if type(chat) not in [
-            ChatForbidden, ChannelForbidden] and chat.title not in BANNED_CHANNELS
-        ]
+        if dialogs:
+            # filter dialogs for forbidden chats
+            filtered_data: List[Union[ChatEmpty, Chat, Channel]] = [chat for chat in dialogs.chats if type(chat) not in [
+                ChatForbidden, ChannelForbidden] and chat.title not in BANNED_CHANNELS
+            ]
 
+            payload: List[str, Union[ChatEmpty, Chat, Channel]] = [{
+                'id': elem.id,
+                'name': elem.title,
+                'type': (lambda x: 'CHANNEL' if type(x) == Channel else 'CHAT')(elem)
+            } for elem in filtered_data]
 
-        payload: List[str, Union[ChatEmpty, Chat, Channel]] = [{
-            'id': elem.id,
-            'name': elem.title,
-            'type': (lambda x: 'CHANNEL' if type(x) == Channel else 'CHAT')(elem)
-        } for elem in filtered_data]
-
-        response.update({
-            "success": True,
-            "data": payload
-        })
+            response.update({
+                "success": True,
+                "data": payload
+            })
 
         LOG.info('Sending response for channels request: {}'.format(response))
 
