@@ -90,7 +90,10 @@ class ChannelHandler(RequestHandler):
         LOG.info('Sending request for contacts to telegram to get list of dialogs')
 
         try:
+            print("""DIALOGS""")
             dialogs = tg_app.get_dialogs()
+            print(dialogs)
+            print("""END DIALOGS""")
 
             # LOG.info('Got the following list of dialogs: {}'.format(dialogs))
 
@@ -102,16 +105,16 @@ class ChannelHandler(RequestHandler):
             self.write(dumps(response))
             self.flush()
 
-        if dialogs:
-            # payload: List[str, Union[ChatEmpty, Chat, Channel]] = [{
-            #     'id': elem.id,
-            #     'name': elem.title,
-            #     'type': (lambda x: 'CHANNEL' if type(x) == Channel else 'CHAT')(elem)
-            # } for elem in dialogs]
-
-            for elem in dialogs:
-                print(type(elem))
-                print(elem)
+        # if dialogs:
+        #     # payload: List[str, Union[ChatEmpty, Chat, Channel]] = [{
+        #     #     'id': elem.id,
+        #     #     'name': elem.title,
+        #     #     'type': (lambda x: 'CHANNEL' if type(x) == Channel else 'CHAT')(elem)
+        #     # } for elem in dialogs]
+        #
+        #     for elem in dialogs:
+        #         print(type(elem))
+        #         print(elem)
 
 
             # response.update({
