@@ -45,6 +45,9 @@ try:
     )
     tg_app.start()
 
+    print(tg_app.get_dialogs())
+
+
     LOG.info('Successfully initialized telegram client')
 
 except Exception as e:
