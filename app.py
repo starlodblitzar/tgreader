@@ -103,16 +103,20 @@ class ChannelHandler(RequestHandler):
             self.flush()
 
         if dialogs:
-            payload: List[str, Union[ChatEmpty, Chat, Channel]] = [{
-                'id': elem.id,
-                'name': elem.title,
-                'type': (lambda x: 'CHANNEL' if type(x) == Channel else 'CHAT')(elem)
-            } for elem in dialogs]
+            # payload: List[str, Union[ChatEmpty, Chat, Channel]] = [{
+            #     'id': elem.id,
+            #     'name': elem.title,
+            #     'type': (lambda x: 'CHANNEL' if type(x) == Channel else 'CHAT')(elem)
+            # } for elem in dialogs]
 
-            response.update({
-                "success": True,
-                "data": payload
-            })
+            for elem in dialogs:
+                print(type(elem))
+
+
+            # response.update({
+            #     "success": True,
+            #     "data": payload
+            # })
 
             self.write(dumps(response))
 
