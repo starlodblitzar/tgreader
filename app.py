@@ -93,6 +93,7 @@ class ChannelHandler(RequestHandler):
 
         try:
             dialogs = tg_app.get_dialogs_chunk(offset_date=0)
+            print(dialogs.chats)
 
             LOG.info('Got the following list of dialogs: {}'.format(dialogs))
 
@@ -102,7 +103,6 @@ class ChannelHandler(RequestHandler):
             response.update({'success': False})
 
             self.write(dumps(response))
-            self.flush()
 
         if dialogs:
 
