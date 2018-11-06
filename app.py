@@ -104,7 +104,7 @@ class ChannelHandler(RequestHandler):
 
             LOG.error('Failed to get response from telegram with the following error: {}. Traceback: {}.'.format(
                 e,
-                exc_traceback)
+                str(exc_traceback))
             )
 
             response.update({'success': False})
