@@ -94,6 +94,8 @@ class ChannelHandler(RequestHandler):
         try:
             dialogs = tg_app.get_dialogs()
 
+            print(dialogs)
+
             LOG.info('Got the following list of dialogs: {}'.format(dialogs))
 
         except Exception as e:
