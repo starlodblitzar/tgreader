@@ -93,6 +93,8 @@ class ChannelHandler(RequestHandler):
             print("""DIALOGS""")
             dialogs = tg_app.get_dialogs()
             print(dialogs)
+            for dialog in dialogs:
+                print(type(dialog))
             print("""END DIALOGS""")
 
             # LOG.info('Got the following list of dialogs: {}'.format(dialogs))
