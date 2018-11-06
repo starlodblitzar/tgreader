@@ -3,8 +3,10 @@ from tornado.web import Application, RequestHandler
 from tornado.httputil import HTTPServerRequest
 
 from pyrogram import Client
+from pyrogram.api.functions.messages import GetDialogs, GetAllChats
+
 from pyrogram.api.types import Chat, ChannelForbidden, Channel, ChatForbidden, ChatEmpty, Message
-from pyrogram.api.types.messages import DialogsSlice
+from pyrogram.api.types.messages import Dialogs
 
 from logging import getLogger, Formatter, DEBUG
 from logging.handlers import TimedRotatingFileHandler
@@ -85,13 +87,14 @@ class ChannelHandler(RequestHandler):
 
     def get(self) -> None:
         response: dict = dict()
-        dialogs: Optional[DialogsSlice] = None
+        dialogs: Optional[Dialogs] = None
 
         LOG.info('Sending request for contacts to telegram to get list of dialogs')
 
         try:
-            print(tg_app)
-            dialogs = tg_app.get_dialogs_chunk(offset_date=0)
+            dialogs = tg_app.send(
+                GetAllChats(except_ids=[])
+            )
 
             LOG.info('Got the following list of dialogs: {}'.format(dialogs))
 
@@ -104,10 +107,8 @@ class ChannelHandler(RequestHandler):
 
         if dialogs:
 
-            filtered_data: List[Channel, Chat, ChatEmpty] = [
-                dialog for dialog in dialogs.chats if (
-                        type(dialog) not in [ChannelForbidden, ChatForbidden] and dialog.title not in BANNED_CHANNELS
-                )
+            filtered_data: List[Channel, Chat] = [
+                dialog for dialog in dialogs.chats if dialog.title not in BANNED_CHANNELS
             ]
 
             payload: List[str, Union[ChatEmpty, Chat, Channel]] = [{
@@ -207,6 +208,6 @@ if __name__ == "__main__":
     app: Application = Application([
         (r'/channels', ChannelHandler)
     ])
-    app.listen(port=9001, address='0.0.0.0')
+    app.listen(port=9002, address='0.0.0.0')
     LOG.info('App inited.')
     IOLoop.current().start()
