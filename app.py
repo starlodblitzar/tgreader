@@ -5,7 +5,7 @@ from tornado.httputil import HTTPServerRequest
 from pyrogram import Client
 from pyrogram.api.functions.messages import GetAllChats
 
-from pyrogram.api.types import Chat, ChannelForbidden, Channel, ChatForbidden, ChatEmpty, Message
+from pyrogram.api.types import Chat, Channel, ChatEmpty, Message
 from pyrogram.api.types.messages import ChatsSlice
 
 from logging import getLogger, Formatter, DEBUG
@@ -96,7 +96,7 @@ class ChannelHandler(RequestHandler):
                 GetAllChats(except_ids=[])
             )
 
-            LOG.info('Got the following list of dialogs: {}'.format(dialogs.__dict__))
+            LOG.info('Got the following list of dialogs: {}'.format(str(dialogs.__dict__)).encode('utf-8'))
 
         except Exception as e:
             LOG.error('Failed to get response from telegram with the following error: {}'.format(e))
@@ -151,7 +151,7 @@ def message_handler(app, message: Message) -> None:
                 message.date)
         )
 
-        LOG.info("Message content: {}".format(str(message.__dict__)))
+        LOG.info("Message content: {}".format(str(message.__dict__).encode('utf-8')))
 
         payload.update({
             'channel_id': channel_id,
